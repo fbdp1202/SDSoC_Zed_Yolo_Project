@@ -24,27 +24,39 @@ slayer *lBuffer;
 void make_sds_buffer(int ns)
 {
 	lBuffer = (slayer *)malloc(sizeof(slayer)*ns);
+	if ( lBuffer == NULL ) {
+		printf("malloc error\n"); exit(-1);
+	}
+	int i;
+	for ( i = 0; i < ns; i++ ) {
+		lBuffer[i] = {0};
+	}
 }
-
-void init_sds_buffer()
-
 
 void delete_sds_buffer()
 {
 	int i, j;
 	for ( i = 0; i < sizeof(lBuffer) / sizeof(slayer); i++ ) {
-		if(A != NULL){
-			for ( j = 0; j < numWA*numHA; j++)
-				free(A[j]);
-			free(A);
+		if ( lBuffer[i].A != NULL ) {
+			for ( j = 0; j < lBuffer[i].numWA*lBuffer[i].numHA; j++ ) {
+				free(lBuffer[i].A[j]);
+			}
+			free(lBuffer[i].A);
 		}
+		if ( lBuffer[i].B != NULL){
+			for ( j = 0; j < lBuffer[i].numWB*lBuffer[i].numHB; j++ ) {
+				free(lBuffer[i].B[j]);
+			}
+			free(lBuffer[i].B);
+		}
+		if ( lBuffer[i].C != NULL ) free(lBuffer[i].C);
 	}
+	free(lBuffer);
 }
 
 void set_sds_buffer(int index, float *weight, int m, int n, int k)
 {
 	int i, j, x, y;
-	lBuffer[index] = {0};
 
 	lBuffer[index].numWA = k/GEMM_WIDTH + 1;
 	lBuffer[index].numHA = m/GEMM_HEIGHT + 1;
